@@ -1,0 +1,235 @@
+{
+  "version": "8.9.0",
+  "files": [
+    {
+      "path": ".gitignore",
+      "bytes": 253,
+      "sha256": "fe718e7babb14f3cbad2d97f08889b9ce5215ed3fe0e43b2b8cfbfb3b9b844e8"
+    },
+    {
+      "path": "CURA-DEFINITIVA-SKYNET.ps1",
+      "bytes": 10117,
+      "sha256": "71331df7846d0f81cf020f97a28f2f8f28ba332acc0f4112de5afd6f0136aa8b"
+    },
+    {
+      "path": "DIAGNOSE-SKYNET-V8.cmd",
+      "bytes": 103,
+      "sha256": "868cab23e412d55914136a06a38eece9c3636b182dcee7f6d544cbe200286a00"
+    },
+    {
+      "path": "DIAGNOSE-SKYNET-V8.ps1",
+      "bytes": 1320,
+      "sha256": "77eab59be9a6ed3cfcc50e46ee13ef24db29ce9253f9cda0c8cea73172e6c8bc"
+    },
+    {
+      "path": "INSTALL-UPDATE-SKYNET-V8.cmd",
+      "bytes": 109,
+      "sha256": "d6a47763b49a02ca702a7373dfae6543f202158cf9e305914c8caee7dee701fd"
+    },
+    {
+      "path": "INSTALL-UPDATE-SKYNET-V8.ps1",
+      "bytes": 532,
+      "sha256": "7e34f610f1a0ec172f6e3b352d519d2b5be95fc39606a08f4da94a139989223c"
+    },
+    {
+      "path": "README.md",
+      "bytes": 1995,
+      "sha256": "25fa36e14ca560897582593d4aaf8333d5016f9c9b37011fb39c503b44069d08"
+    },
+    {
+      "path": "REPAIR-SKYNET-V8.cmd",
+      "bytes": 101,
+      "sha256": "acff3e235e0b21f1145d1c5498ec7ce4d5a9be66c0bd3886882cab5b541f5fa8"
+    },
+    {
+      "path": "REPAIR-SKYNET-V8.ps1",
+      "bytes": 1458,
+      "sha256": "c7220d5d45eb93f481c846ecba1e650760097c0bc138f03f7ab871d2c8c072dd"
+    },
+    {
+      "path": "ROLLBACK-SKYNET-V8.cmd",
+      "bytes": 103,
+      "sha256": "d67a6c8b65e58047b64470907db97d5cdaa4c1abeda706594dead5c5eff30fda"
+    },
+    {
+      "path": "ROLLBACK-SKYNET-V8.ps1",
+      "bytes": 1508,
+      "sha256": "964ee23dd410c6f0d9149b2ab7f01e5f22ed5926e133898ab6923e6a5800939c"
+    },
+    {
+      "path": "START-SKYNET-V8.cmd",
+      "bytes": 100,
+      "sha256": "92437ba6d3f5a72be7f1f10055776801d2822e20a456f29bbbe02205dbe6e475"
+    },
+    {
+      "path": "START-SKYNET-V8.ps1",
+      "bytes": 5761,
+      "sha256": "a5a7819d2d3a18fff030f1da5bc7942bf4398e19491d34be5d0e05bd2ee8ac8d"
+    },
+    {
+      "path": "STOP-SKYNET-V8.cmd",
+      "bytes": 99,
+      "sha256": "db05618a211ddefc5ad6a82c9afe4df9514b542daff7ecf7114f12702a180be6"
+    },
+    {
+      "path": "STOP-SKYNET-V8.ps1",
+      "bytes": 220,
+      "sha256": "f579db1b96bb2d0c154d0aa03cd82657540dbc25d8046cc9f2865ab1fa7a84ce"
+    },
+    {
+      "path": "SUPERVISOR-SKYNET-V8.cmd",
+      "bytes": 105,
+      "sha256": "5daf955709a46d4411a91c1ef7ba3e2e6ec9d32189e9b54ea6a3221254ad5dba"
+    },
+    {
+      "path": "SUPERVISOR-SKYNET-V8.ps1",
+      "bytes": 909,
+      "sha256": "43da8ccc3ab0554b2a2721d0ee8519c7f9066eb37f37ebc05fc618f2f56601e3"
+    },
+    {
+      "path": "V8-ONECLICK.cmd",
+      "bytes": 96,
+      "sha256": "15cd07906a84cc414dea1a374bb3eb83038b815f2a01e510a551a2598b81b6cc"
+    },
+    {
+      "path": "V8-ONECLICK.ps1",
+      "bytes": 419,
+      "sha256": "9dd4f9cc957c52cbd537070c1385dd21989af8c5d7b18d73af433e1d33b9de9a"
+    },
+    {
+      "path": "VERSION.json",
+      "bytes": 223,
+      "sha256": "0242990c47a13de14e34dbfbcb8990eefac8243755f3bd37e6c76a30bc5ee62c"
+    },
+    {
+      "path": "core/config.cjs",
+      "bytes": 610,
+      "sha256": "b992cb8e0d9a18ce41a1b853a99cccb6ea74d419fd3e7a78089ce1d21485dd55"
+    },
+    {
+      "path": "core/event-store.cjs",
+      "bytes": 2390,
+      "sha256": "33007b3d9fc042b82bae67c8de210b210bcfb0f71a318681652267f0ba105a08"
+    },
+    {
+      "path": "core/operation-engine.cjs",
+      "bytes": 2916,
+      "sha256": "9b87f55fc8fbc207195aabfc93e6a2c60b09b4988d96fa1f4c4917714aa58c0c"
+    },
+    {
+      "path": "core/packet-generator.cjs",
+      "bytes": 1583,
+      "sha256": "caeee6a4f98c9c64fff04e46a75c84a206e9d222124d388d6d7ee72dde752bd6"
+    },
+    {
+      "path": "core/session-manager.cjs",
+      "bytes": 777,
+      "sha256": "59fe64f5747994ccb8aceb90c70588bcbaf62ffa58a675f3a9b4824db171a4f1"
+    },
+    {
+      "path": "core/util.cjs",
+      "bytes": 1079,
+      "sha256": "a34cce26e92750d13629f9c67107e7cd41de72efe81f96bb879d9fde425bb04b"
+    },
+    {
+      "path": "eslint.config.js",
+      "bytes": 568,
+      "sha256": "0197d9a843aaae267303c4d1ab1a43afad1afacc7646cdf6cf94a5af6b815fb8"
+    },
+    {
+      "path": "index.html",
+      "bytes": 368,
+      "sha256": "bce2c7186e96008d53cf63d4d65ee1fa0b1e14bbd9cf572289797b0c4ec825c4"
+    },
+    {
+      "path": "package-lock.json",
+      "bytes": 112209,
+      "sha256": "f5e3aac952f2604f129d4660a8488f14c0c5fdc220e131dbda6df00c83b77ec1"
+    },
+    {
+      "path": "package.json",
+      "bytes": 1205,
+      "sha256": "9e04243c30edcf2f23f9b69613e9bac3732bfc7fec747a02e4f4627bf7232feb"
+    },
+    {
+      "path": "public/favicon.svg",
+      "bytes": 9522,
+      "sha256": "61bc9a161de58248288e6905425d7180f0624c2865007b97d763fdac12043a66"
+    },
+    {
+      "path": "public/icons.svg",
+      "bytes": 5031,
+      "sha256": "b45fa506195cfcdef406ba9f0c77b36ddc1a7c224040926ec70abc2fdea7b93a"
+    },
+    {
+      "path": "scripts/common.ps1",
+      "bytes": 2790,
+      "sha256": "3d839dd005ed63677f252564daa28ba21677b77f2e0e4cb569671a31f618cbbf"
+    },
+    {
+      "path": "server.cjs",
+      "bytes": 8047,
+      "sha256": "8a43177a59d516c4bf61a2bfc6d4329d6feac03409ed1278b419bb19c311a49f"
+    },
+    {
+      "path": "src/App.jsx",
+      "bytes": 10060,
+      "sha256": "1674166185ed9c11737c8952c3e872dd4b8ec505072cce93661e0cfaf9e0ec50"
+    },
+    {
+      "path": "src/index.css",
+      "bytes": 7347,
+      "sha256": "6cb27242be278db8e94757f1b4163b2b4c34d7c4611496f7528fbb76925afb6c"
+    },
+    {
+      "path": "src/main.jsx",
+      "bytes": 229,
+      "sha256": "4b4b864dbe45253425d0c925337180ec07e204295179f80f59551216f466f618"
+    },
+    {
+      "path": "tampermonkey/SKYNET-PGSOFT-OBSERVER.user.js",
+      "bytes": 1347,
+      "sha256": "01900ee63a285ff767e4790647c89b50df898016f490cdca0d7e32d1032c3687"
+    },
+    {
+      "path": "tampermonkey/SKYNET-V8-LOCAL-TEST.user.js",
+      "bytes": 1135,
+      "sha256": "e04e95a8f458ad403c71d1c15e37fc9e4320646b3f9cf219d0eaed9ae3ab3d3c"
+    },
+    {
+      "path": "tests/integration.cjs",
+      "bytes": 3130,
+      "sha256": "cca728b749366ae47b73fddb3d7e70eb479eece96c14afb676200d0025825f73"
+    },
+    {
+      "path": "tests/unit-core.cjs",
+      "bytes": 2276,
+      "sha256": "c1fe1defcea29723c1d0511f95c525a80679466a6e3426aac4c4de56a3e7fcdd"
+    },
+    {
+      "path": "tests.cjs",
+      "bytes": 3873,
+      "sha256": "d977d46e91443fc68a0193f9ff28162d39ab9bedac3da1cce8eab37a079277e5"
+    },
+    {
+      "path": "tools/benchmark.cjs",
+      "bytes": 653,
+      "sha256": "2f6fa505a411318a4f016603a846bf91535425aca91f2bc3239865fed07d5abc"
+    },
+    {
+      "path": "tools/doctor.cjs",
+      "bytes": 830,
+      "sha256": "878723cfac923630fa395cd13de2522b25e425d31d8c29961f695504ce9ae1d3"
+    },
+    {
+      "path": "tools/ws-smoke.cjs",
+      "bytes": 696,
+      "sha256": "9b3e6afb167b39d8489c877d3d3e7975b9445abe285c056191dbf644ec172e96"
+    },
+    {
+      "path": "vite.config.js",
+      "bytes": 513,
+      "sha256": "eeb61c389c3e04a7502cc8ea9827e04f77775813583fa730d72ca75adfca03e4"
+    }
+  ]
+}

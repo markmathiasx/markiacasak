@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "version": "8.9.0",
+  "timestamp": "2026-11-13T23:06:02.2501223-03:00",
+  "frontend": "http://127.0.0.1:5173/",
+  "backend": "http://127.0.0.1:3000/health",
+  "backendPid": 9040,
+  "frontendPid": 15716,
+  "health": "PASS",
+  "proxy": "PASS",
+  "state": "PASS",
+  "metrics": "PASS",
+  "websocket": "PASS",
+  "queueSynthetic": "PASS",
+  "tests": "PASS"
+}
