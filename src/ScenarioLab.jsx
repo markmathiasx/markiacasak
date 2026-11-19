@@ -12,6 +12,7 @@ const errors = {
   LAB_SESSION_EXPIRED: 'Sessão encerrada. Inicie uma nova rodada com A ou B.',
   INVALID_SCENARIO: 'Use uma semente inteira válida e dois perfis diferentes em B.',
   LAB_SESSION_LIMIT: 'Limite de sessões locais atingido.',
+  ORIGIN_NOT_ALLOWED: 'A origem desta página não está autorizada pelo Core.',
 };
 const base = '/api/scenario-lab';
 const options = Object.entries(profiles).map(([key, label]) => <option key={key} value={key}>{label}</option>);

@@ -20,7 +20,7 @@ Para usar outra raiz: `-Target 'C:\caminho\do\projeto'`.
 
 O reparador confere os SHA-256 do manifesto, cria backup dos arquivos
 substituidos, para somente processos identificados como pertencentes ao projeto,
-instala dependencias quando necessario, roda 13 testes, faz o build, inicia
+instala dependencias quando necessario, roda 26 testes, faz o build, inicia
 Node/Vite nas portas 3000/5173 e valida saude, proxy, API, fila sintetica
 e WebSocket. Se houver falha, restaura os arquivos anteriores.
 `node_modules` e os dados em `logs/`, `.runtime/`, `backups/` nao sao apagados
@@ -41,3 +41,24 @@ Para retornar aos arquivos anteriores: `ROLLBACK-SKYNET-V8.cmd`.
 
 **Validacao no seu PC e obrigatoria**: a disponibilidade das dependencias npm e
 das portas locais varia de maquina para maquina.
+
+## Execucao em Linux ou ambiente na nuvem
+
+Use Node.js 22.12 ou mais recente. O modo de producao serve o frontend compilado,
+a API e o WebSocket pelo mesmo processo e pela mesma porta:
+
+```bash
+npm ci --no-audit --no-fund
+npm test
+npm start
+```
+
+Por padrao, `npm start` escuta em `0.0.0.0:5173`. Use `npm run start:local`
+quando o acesso deve permanecer somente no computador atual. Para acesso remoto,
+publique a porta 5173 apenas por uma previa autenticada ou por uma hospedagem com
+controle de acesso. Digitar `127.0.0.1:5173` em outro computador sempre aponta
+para esse outro computador, nao para a maquina que executa o SKYNET.
+
+O desenvolvimento com recarga automatica continua disponivel com `npm run backend`
+e `npm run dev`. `npm run dev:remote` aceita conexoes de rede, e os hostnames
+permitidos devem ser informados em `SKYNET_ALLOWED_HOSTS`, separados por virgula.

@@ -24,12 +24,21 @@ class EventStore {
 
   restore() {
     try {
-      if (!fs.existsSync(this.config.paths.state)) return;
-      const raw = JSON.parse(fs.readFileSync(this.config.paths.state, 'utf8'));
-      this.operations = Array.isArray(raw.operations) ? raw.operations.slice(0, this.config.maxOperations) : [];
-      this.observations = Array.isArray(raw.observations) ? raw.observations.slice(0, 300) : [];
-      if (raw.metrics) this.metrics = { ...this.metrics, ...raw.metrics };
+      if (fs.existsSync(this.config.paths.state)) {
+        const raw = JSON.parse(fs.readFileSync(this.config.paths.state, 'utf8'));
+        this.operations = Array.isArray(raw.operations) ? raw.operations.slice(0, this.config.maxOperations) : [];
+        this.observations = Array.isArray(raw.observations) ? raw.observations.slice(0, 300) : [];
+        if (raw.metrics) this.metrics = { ...this.metrics, ...raw.metrics };
+      }
     } catch {
+      this.metrics.errors += 1;
+    }
+    try {
+      if (!fs.existsSync(this.config.paths.events)) return;
+      const lines = fs.readFileSync(this.config.paths.events, 'utf8').trim().split('\n').filter(Boolean);
+      this.events = lines.slice(-this.config.maxEvents).map(line => JSON.parse(line)).reverse();
+    } catch {
+      this.events = [];
       this.metrics.errors += 1;
     }
   }
@@ -48,7 +57,7 @@ class EventStore {
     this.events.unshift(event);
     if (this.events.length > this.config.maxEvents) this.events.length = this.config.maxEvents;
     this.metrics.eventsTotal += 1;
-    appendNdjson(this.config.paths.events, event);
+    appendNdjson(this.config.paths.events, event, this.config.logMaxBytes);
     if (this.metrics.eventsTotal % this.config.eventPersistEvery === 0) this.persist();
   }
 
@@ -66,7 +75,7 @@ class EventStore {
   }
 
   audit(entry) {
-    appendNdjson(this.config.paths.audit, entry);
+    appendNdjson(this.config.paths.audit, entry, this.config.logMaxBytes);
   }
 
   snapshot() {

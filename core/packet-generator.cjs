@@ -4,10 +4,10 @@ const { now, uuid, sha256 } = require('./util.cjs');
 class PacketGenerator {
   makeSocketIo(event, data = {}) {
     const payload = [String(event).slice(0, 80), {
+      ...data,
       id: uuid(),
       timestamp: now(),
       synthetic: true,
-      ...data,
     }];
     const frame = `42${JSON.stringify(payload)}`;
     return { format: 'socket.io-text', frame, bytes: Buffer.byteLength(frame), sha256: sha256(frame) };

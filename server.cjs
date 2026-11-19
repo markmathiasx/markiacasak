@@ -2,6 +2,8 @@
 
 const express = require('express');
 const http = require('http');
+const fs = require('fs');
+const path = require('path');
 const WebSocket = require('ws');
 
 const config = require('./core/config.cjs');
@@ -25,11 +27,19 @@ function parseArgs(argv) {
 const CLI = parseArgs(process.argv.slice(2));
 const HOST = CLI.host;
 const PORT = CLI.port;
+const DIST = path.join(__dirname, 'dist');
+
+function isSameOriginHeaders(headers) {
+  const origin = headers.origin;
+  if (!origin) return true;
+  const host = headers.host;
+  if (!host) return false;
+  try { return new URL(origin).host === host; } catch { return false; }
+}
 
 const app = express();
 app.disable('x-powered-by');
 app.use(express.json({ limit: `${Math.ceil(config.maxJsonBytes / 1024)}kb` }));
-mountScenarioLab(app);
 
 const server = http.createServer(app);
 const wss = new WebSocket.Server({
@@ -37,9 +47,10 @@ const wss = new WebSocket.Server({
   path: config.wsPath,
   maxPayload: 256 * 1024,
   perMessageDeflate: false,
+  verifyClient: info => isSameOriginHeaders(info.req.headers),
 });
 
-const sessions = new SessionManager();
+const sessions = new SessionManager(config.sessionMax);
 const packetGenerator = new PacketGenerator();
 const store = new EventStore(config);
 
@@ -63,6 +74,7 @@ const engine = new OperationEngine({
   store,
   broadcast,
   maxBurst: config.operationBurstMax,
+  maxQueue: config.operationQueueMax,
 });
 
 app.use((req, _res, next) => {
@@ -78,6 +90,15 @@ app.use((req, _res, next) => {
   });
   next();
 });
+
+app.use((req, res, next) => {
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method) && !isSameOriginHeaders(req.headers)) {
+    return res.status(403).json({ ok: false, error: 'ORIGIN_NOT_ALLOWED' });
+  }
+  next();
+});
+
+mountScenarioLab(app, { isSameOriginHeaders });
 
 app.get('/health', (_req, res) => {
   res.json({
@@ -147,9 +168,20 @@ app.post('/api/mutate', (req, res) => {
 app.post('/api/operation', (req, res) => {
   const provider = sanitizeText(req.body?.provider || 'PGSOFT', 32).toUpperCase();
   const vector = sanitizeText(req.body?.vector || 'RACE_CONDITION', 64).toUpperCase();
-  const intensity = Math.max(1, Math.min(Number(req.body?.intensity) || 25, config.operationBurstMax));
+  const requestedIntensity = Number(req.body?.intensity);
+  const intensity = Number.isFinite(requestedIntensity)
+    ? Math.max(1, Math.min(Math.trunc(requestedIntensity), config.operationBurstMax))
+    : 25;
 
-  const job = engine.enqueue({ provider, vector, intensity });
+  let job;
+  try {
+    job = engine.enqueue({ provider, vector, intensity });
+  } catch (error) {
+    if (error?.code === 'QUEUE_FULL') {
+      return res.status(429).json({ ok: false, error: 'QUEUE_FULL' });
+    }
+    throw error;
+  }
   res.status(202).json({
     ok: true,
     status: 'QUEUED',
@@ -182,6 +214,16 @@ app.post('/api/reset-lab', (_req, res) => {
   broadcast({ type: 'LAB_RESET', timestamp: now() });
   res.json({ ok: true });
 });
+
+if (fs.existsSync(DIST)) {
+  app.use(express.static(DIST, { index: false, maxAge: '1h' }));
+  app.use((req, res, next) => {
+    if (req.method !== 'GET' || req.path === '/health' || req.path.startsWith('/api/') || req.path === config.wsPath) {
+      return next();
+    }
+    res.sendFile(path.join(DIST, 'index.html'));
+  });
+}
 
 wss.on('connection', (socket) => {
   socket.isAlive = true;
@@ -240,8 +282,15 @@ const heartbeat = setInterval(() => {
 }, config.heartbeatMs);
 heartbeat.unref();
 
+app.use((_req, res) => {
+  res.status(404).json({ ok: false, error: 'NOT_FOUND' });
+});
+
 app.use((err, _req, res, _next) => {
   store.metrics.errors += 1;
+  if (err?.type === 'entity.parse.failed') {
+    return res.status(400).json({ ok: false, error: 'INVALID_JSON' });
+  }
   console.error('[HTTP ERROR]', err);
   res.status(500).json({ ok: false, error: 'INTERNAL_ERROR' });
 });

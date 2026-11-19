@@ -32,6 +32,7 @@ export default function App() {
   const [mutateResult, setMutateResult] = useState('');
   const pending = useRef(null);
   const wsRef = useRef(null);
+  const activeJob = useRef(null);
   const refresh = useCallback(async () => {
     if (pending.current) return;
     const controller = new AbortController();
@@ -42,7 +43,13 @@ export default function App() {
       if (controller.signal.aborted) return;
       setHealth(h);
       setState(s);
-      setStatus(current => (current === 'BOOTING' || current.startsWith('API ERROR')) ? 'READY' : current);
+      const completed = activeJob.current && s.operations?.find(operation => operation.id === activeJob.current);
+      if (completed) {
+        setStatus(`${completed.id.slice(0, 8)} ${completed.status}`);
+        activeJob.current = null;
+      } else {
+        setStatus(current => (current === 'BOOTING' || current.startsWith('API ERROR')) ? 'READY' : current);
+      }
     } catch (e) {
       if (controller.signal.aborted) return;
       setStatus(`API ERROR: ${e.message}`);
@@ -70,7 +77,23 @@ export default function App() {
       wsRef.current = socket;
       setWsStatus('CONNECTING');
       socket.onopen = () => { setWsStatus('ONLINE'); scheduleRefresh(); };
-      socket.onmessage = scheduleRefresh;
+      socket.onmessage = event => {
+        try {
+          const message = JSON.parse(String(event.data));
+          if (message.type === 'OPERATION_COMPLETED') {
+            setStatus(`${message.id.slice(0, 8)} DONE`);
+            activeJob.current = null;
+          } else if (message.type === 'OPERATION_FAILED') {
+            setStatus(`${message.id.slice(0, 8)} FAILED`);
+            activeJob.current = null;
+          } else if (message.type === 'PONG') {
+            setStatus('PONG');
+          }
+        } catch {
+          // Refresh still reconciles state when a non-JSON frame is received.
+        }
+        scheduleRefresh();
+      };
       socket.onerror = () => setWsStatus('ERROR');
       socket.onclose = () => setWsStatus('OFFLINE');
     }
@@ -100,6 +123,7 @@ export default function App() {
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ provider, vector, intensity }),
       });
+      activeJob.current = data.job.id;
       setStatus(`${data.job.id.slice(0,8)} QUEUED`);
       void refresh();
     } catch (e) {
@@ -110,19 +134,27 @@ export default function App() {
   async function generatePacket(format='socketio') {
     let data;
     try { data = JSON.parse(packetJson); } catch { setPacketResult('INVALID JSON'); return; }
-    const r = await api('/api/packet', {
-      method:'POST', headers:{'content-type':'application/json'},
-      body:JSON.stringify({format,event:packetEvent,data})
-    });
-    setPacketResult(JSON.stringify(r.packet, null, 2));
+    try {
+      const r = await api('/api/packet', {
+        method:'POST', headers:{'content-type':'application/json'},
+        body:JSON.stringify({format,event:packetEvent,data})
+      });
+      setPacketResult(JSON.stringify(r.packet, null, 2));
+    } catch (error) {
+      setPacketResult(`ERROR: ${error.message}`);
+    }
   }
 
   async function mutate(strategy) {
-    const r = await api('/api/mutate', {
-      method:'POST', headers:{'content-type':'application/json'},
-      body:JSON.stringify({frame:mutateInput,strategy})
-    });
-    setMutateResult(r.mutated);
+    try {
+      const r = await api('/api/mutate', {
+        method:'POST', headers:{'content-type':'application/json'},
+        body:JSON.stringify({frame:mutateInput,strategy})
+      });
+      setMutateResult(r.mutated);
+    } catch (error) {
+      setMutateResult(`ERROR: ${error.message}`);
+    }
   }
 
   const events = state.events || [];

@@ -2,6 +2,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { spawn } = require('node:child_process');
+const http = require('node:http');
 const WebSocket = require('ws');
 const { mkdtempSync, rmSync } = require('node:fs');
 const { tmpdir } = require('node:os');
@@ -70,6 +71,32 @@ test('cenários A/B/C isolam as sessões e ativam o bônus uma única vez', asyn
   assert.equal((await call('/state', second)).round, null);
 });
 
+test('cenário aceita origem same-origin publicada e rejeita origem divergente', async () => {
+  function request(origin) {
+    return new Promise((resolve, reject) => {
+      const call = http.request({
+        hostname: '127.0.0.1',
+        port: PORT,
+        path: '/api/scenario-lab/session',
+        method: 'POST',
+        headers: {
+          host: 'preview.example.test',
+          origin,
+          'content-type': 'application/json',
+          'content-length': 2,
+        },
+      }, response => {
+        response.resume();
+        response.once('end', () => resolve(response.statusCode));
+      });
+      call.once('error', reject);
+      call.end('{}');
+    });
+  }
+  assert.equal(await request('https://preview.example.test'), 201);
+  assert.equal(await request('https://attacker.example.test'), 403);
+});
+
 test('CLI host/port beats stale environment', async()=>{
   const h=await health();
   assert.equal(h.service,'skynet-v8-lucifer-core');
@@ -90,6 +117,26 @@ test('packet generator builds socketio text and binary', async()=>{
   }
 });
 
+test('packet generator preserves trusted synthetic metadata', async()=>{
+  const r=await fetch(`http://127.0.0.1:${PORT}/api/packet`,{
+    method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({format:'socketio',event:'lab.test',data:{id:'forged',timestamp:'forged',synthetic:false}})
+  });
+  const b=await r.json();
+  const payload=JSON.parse(b.packet.frame.slice(2))[1];
+  assert.notEqual(payload.id,'forged');
+  assert.notEqual(payload.timestamp,'forged');
+  assert.equal(payload.synthetic,true);
+});
+
+test('JSON inválido retorna erro de cliente', async()=>{
+  const r=await fetch(`http://127.0.0.1:${PORT}/api/session`,{
+    method:'POST',headers:{'content-type':'application/json'},body:'{'
+  });
+  assert.equal(r.status,400);
+  assert.equal((await r.json()).error,'INVALID_JSON');
+});
+
 test('mutation lab mutates without touching external services', async()=>{
   const r=await fetch(`http://127.0.0.1:${PORT}/api/mutate`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({frame:'42["x",{"a":1}]',strategy:'truncate'})});
   const b=await r.json(); assert.equal(b.ok,true); assert.notEqual(b.mutated,'42["x",{"a":1}]');
@@ -105,6 +152,23 @@ test('queued operation completes and persists state', async()=>{
     await new Promise(r=>setTimeout(r,50));
   }
   assert.equal(done,true);
+});
+
+test('intensidade fracionária é normalizada para quadros inteiros', async()=>{
+  const r=await fetch(`http://127.0.0.1:${PORT}/api/operation`,{
+    method:'POST',headers:{'content-type':'application/json'},
+    body:JSON.stringify({provider:'PGSOFT',vector:'RACE_CONDITION',intensity:1.5})
+  });
+  const b=await r.json();
+  assert.equal(b.job.status,'QUEUED');
+  let operation;
+  for(let i=0;i<80;i++){
+    const state=await (await fetch(`http://127.0.0.1:${PORT}/api/state`)).json();
+    operation=state.operations.find(item=>item.id===b.job.id);
+    if(operation)break;
+    await new Promise(resolve=>setTimeout(resolve,25));
+  }
+  assert.equal(operation.framesGenerated,1);
 });
 
 test('websocket PING/PONG', async()=>{

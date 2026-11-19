@@ -3,11 +3,16 @@ const crypto = require('crypto');
 const { now, uuid } = require('./util.cjs');
 
 class SessionManager {
-  constructor() {
+  constructor(maxSessions = 256) {
     this.sessions = new Map();
+    this.maxSessions = maxSessions;
   }
 
   create(label = 'local-lab') {
+    while (this.sessions.size >= this.maxSessions) {
+      const oldest = this.sessions.keys().next().value;
+      this.sessions.delete(oldest);
+    }
     const sid = crypto.randomBytes(12).toString('hex');
     const session = {
       id: uuid(),
@@ -30,6 +35,10 @@ class SessionManager {
 
   list() {
     return [...this.sessions.values()].map(x => ({ ...x }));
+  }
+
+  remove(sid) {
+    this.sessions.delete(sid);
   }
 
   reset() {

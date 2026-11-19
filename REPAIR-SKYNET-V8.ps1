@@ -22,10 +22,8 @@ if ($LASTEXITCODE -ne 0) {
 if ($LASTEXITCODE -ne 0) { throw 'server.cjs invalido' }
 & node --check .\tests.cjs
 if ($LASTEXITCODE -ne 0) { throw 'tests.cjs invalido' }
-& npm.cmd run test:all
-if ($LASTEXITCODE -ne 0) { throw 'testes falharam; nao iniciar' }
-& npm.cmd run build
-if ($LASTEXITCODE -ne 0) { throw 'build falhou; nao iniciar' }
+& npm.cmd test
+if ($LASTEXITCODE -ne 0) { throw 'testes ou build falharam; nao iniciar' }
 & (Join-Path $Project 'START-SKYNET-V8.ps1') -SkipTests -NoBrowser:$NoBrowser
 if (!$?) { throw 'Inicializacao falhou' }
 Write-Host '[OK] Testes, build, backend, frontend, proxy, fila e websocket validados.' -ForegroundColor Green

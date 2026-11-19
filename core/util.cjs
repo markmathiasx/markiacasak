@@ -23,9 +23,17 @@ function atomicJsonWrite(file, value) {
   fs.renameSync(tmp, file);
 }
 
-function appendNdjson(file, value) {
+function appendNdjson(file, value, maxBytes = 5 * 1024 * 1024) {
   ensureDir(path.dirname(file));
-  fs.appendFileSync(file, JSON.stringify(value) + '\n', 'utf8');
+  const line = JSON.stringify(value) + '\n';
+  let size = 0;
+  try { size = fs.statSync(file).size; } catch {}
+  if (size + Buffer.byteLength(line) > maxBytes) {
+    const archive = `${file}.1`;
+    fs.rmSync(archive, { force: true });
+    if (fs.existsSync(file)) fs.renameSync(file, archive);
+  }
+  fs.appendFileSync(file, line, 'utf8');
 }
 
 function sha256(value) {

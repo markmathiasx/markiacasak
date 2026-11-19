@@ -150,8 +150,7 @@ try {
   else { Status 'Dependencias existentes validadas com npm ls; sem reinstalacao desnecessaria.' }
   NativeStep 'Sintaxe do servidor' 'node' @('--check','.\server.cjs')
   NativeStep 'Sintaxe do teste atualizado' 'node' @('--check','.\tests.cjs')
-  NativeStep 'Suite completa (test:all)' 'npm.cmd' @('run','test:all')
-  NativeStep 'Build da interface' 'npm.cmd' @('run','build')
+  NativeStep 'Suites completas e build de producao' 'npm.cmd' @('test')
 
   if (!$NoStart) {
     $Phase='START'

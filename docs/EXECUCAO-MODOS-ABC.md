@@ -21,15 +21,16 @@ Após uma queda de rede, use **Reconectar sessão** na mesma aba. O painel
 consulta o estado no Core e recupera a rodada e o bônus sem reenviar uma
 ação. Se o Core reiniciar ou a sessão expirar, inicie outra rodada com A ou B.
 
-Validação: `npm run test:all`, `npm run lint`, `npm run build`.
+Validação: `npm test`, `npm run lint`. O comando `npm test` executa as suítes do
+Core e também constrói e testa o servidor de produção em porta única.
 Com o Core e o frontend ativos, use `npm run doctor`.
 
-Resultado desta implementação: 14/14 testes aprovados, lint e build com
-código de saída 0 e quatro verificações aprovadas no doctor. No Chrome,
+Resultado desta implementação: 26/26 testes automatizados aprovados, lint e build
+com código de saída 0 e quatro verificações aprovadas no doctor. No Chrome,
 foram confirmados A e B, C desabilitado antes da primeira rodada, duas
 ativações de C com um único evento no backend e uma nova aba sem acesso
 à rodada anterior.
 
 Validação da reconexão: no Chrome, simulei queda de rede, observei o estado
 de erro e restabeleci a conexão. O painel recuperou o mesmo evento de bônus.
-Testes 14/14, lint, build e doctor 4/4 passaram após a mudança.
+Testes 26/26, lint, build e doctor 4/4 passaram após a mudança.

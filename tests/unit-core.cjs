@@ -24,6 +24,15 @@ test('local sessions advance sequence without sharing session ids', () => {
   assert.equal(mgr.next(b.sid).sequence, 1);
 });
 
+test('local sessions remain bounded', () => {
+  const manager = new SessionManager(2);
+  const first = manager.create('first');
+  manager.create('second');
+  manager.create('third');
+  assert.equal(manager.list().length, 2);
+  assert.equal(manager.next(first.sid), null);
+});
+
 test('operation engine persists exactly requested synthetic frames', async () => {
   const events = [];
   const operations = [];
@@ -51,4 +60,33 @@ test('operation engine persists exactly requested synthetic frames', async () =>
   assert.equal(store.metrics.framesGenerated, 12);
   assert.deepEqual(events.map(x => x.sequence), Array.from({length:12},(_,i)=>i+1));
   assert.equal(broadcasts.some(x => x.type === 'OPERATION_COMPLETED' && x.id === requested.id), true);
+});
+
+test('operation engine recovers after a failed job', async () => {
+  const operations = [];
+  let fail = true;
+  const store = {
+    metrics: { framesGenerated: 0, errors: 0 },
+    pushEvent() {
+      if (fail) {
+        fail = false;
+        throw new Error('simulated storage failure');
+      }
+    },
+    pushOperation: operation => operations.push({ ...operation }),
+  };
+  const engine = new OperationEngine({
+    packetGenerator: new PacketGenerator(),
+    sessions: new SessionManager(),
+    store,
+    broadcast() {},
+  });
+  const failed = engine.enqueue({ provider: 'PGSOFT', vector: 'FAILURE_TEST', intensity: 1 });
+  const completed = engine.enqueue({ provider: 'PGSOFT', vector: 'RECOVERY_TEST', intensity: 1 });
+  for (let attempt = 0; attempt < 100 && operations.length < 2; attempt++) {
+    await new Promise(resolve => setTimeout(resolve, 2));
+  }
+  assert.equal(operations.find(item => item.id === failed.id).status, 'FAILED');
+  assert.equal(operations.find(item => item.id === completed.id).status, 'DONE');
+  assert.equal(engine.status().running, false);
 });

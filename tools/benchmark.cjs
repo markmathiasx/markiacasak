@@ -1,8 +1,10 @@
 'use strict';
 
+const baseUrl = (process.env.SKYNET_BASE_URL || 'http://127.0.0.1:5173').replace(/\/$/, '');
+
 async function post(path, body) {
   const start=performance.now();
-  const r=await fetch(`http://127.0.0.1:3000${path}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
+  const r=await fetch(`${baseUrl}${path}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
   const data=await r.json();
   return {status:r.status,ms:+(performance.now()-start).toFixed(2),data};
 }

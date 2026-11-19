@@ -23,10 +23,8 @@ if (!(Test-Path $vite)) { throw 'Vite ausente; tente npm ci.' }
 if (!$SkipTests) {
   & node --check .\server.cjs
   if ($LASTEXITCODE -ne 0) { throw 'server.cjs invalido' }
-  & npm.cmd run test:all
-  if ($LASTEXITCODE -ne 0) { throw 'test:all falhou' }
-  & npm.cmd run build
-  if ($LASTEXITCODE -ne 0) { throw 'build falhou' }
+  & npm.cmd test
+  if ($LASTEXITCODE -ne 0) { throw 'testes ou build falharam' }
 }
 
 Stop-ProjectProcesses $Project

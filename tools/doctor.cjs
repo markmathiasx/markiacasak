@@ -1,5 +1,7 @@
 'use strict';
 
+const baseUrl = (process.env.SKYNET_BASE_URL || 'http://127.0.0.1:5173').replace(/\/$/, '');
+
 async function check(url) {
   const start = performance.now();
   try {
@@ -17,10 +19,10 @@ async function check(url) {
 
 (async()=>{
   const checks = await Promise.all([
-    check('http://127.0.0.1:3000/health'),
-    check('http://127.0.0.1:5173/'),
-    check('http://127.0.0.1:5173/health'),
-    check('http://127.0.0.1:5173/api/state'),
+    check(`${baseUrl}/`),
+    check(`${baseUrl}/health`),
+    check(`${baseUrl}/api/state`),
+    check(`${baseUrl}/api/metrics`),
   ]);
   console.log(JSON.stringify({timestamp:new Date().toISOString(),checks},null,2));
   process.exitCode = checks.every(x => x.ok) ? 0 : 2;

@@ -37,7 +37,7 @@ function sample(seed, name) {
   };
 }
 
-function mountScenarioLab(app) {
+function mountScenarioLab(app, { isSameOriginHeaders = () => true } = {}) {
   const sessions = new Map();
   const lifetime = 60 * 60 * 1000;
   const base = '/api/scenario-lab';
@@ -46,12 +46,8 @@ function mountScenarioLab(app) {
 
   app.use(base, (req, res, next) => {
     res.set('Cache-Control', 'no-store');
-    if (!['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.socket.remoteAddress)) {
-      return reply(res, 403, { error: 'LAB_LOCAL_ONLY' });
-    }
-    const origin = req.get('origin');
-    if (origin && !/^https?:\/\/(?:127\.0\.0\.1|localhost|\[::1\])(?::\d+)?$/.test(origin)) {
-      return reply(res, 403, { error: 'LAB_LOCAL_ONLY' });
+    if (!isSameOriginHeaders(req.headers)) {
+      return reply(res, 403, { error: 'ORIGIN_NOT_ALLOWED' });
     }
     next();
   });
