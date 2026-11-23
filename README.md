@@ -20,8 +20,13 @@ Para usar outra raiz: `-Target 'C:\caminho\do\projeto'`.
 
 O reparador confere os SHA-256 do manifesto, cria backup dos arquivos
 substituidos, para somente processos identificados como pertencentes ao projeto,
+<<<<<<< Updated upstream
 instala dependencias quando necessario, roda 26 testes, faz o build, inicia
 Node/Vite nas portas 3000/5173 e valida saude, proxy, API, fila sintetica
+=======
+instala dependencias quando necessario, roda 13 testes, faz o build, inicia
+Node/Vite nas portas 39188/5173 e valida saude, proxy, API, fila sintetica
+>>>>>>> Stashed changes
 e WebSocket. Se houver falha, restaura os arquivos anteriores.
 `node_modules` e os dados em `logs/`, `.runtime/`, `backups/` nao sao apagados
 pelo reparador; um `npm ci` necessario pode recriar `node_modules`.
@@ -42,6 +47,7 @@ Para retornar aos arquivos anteriores: `ROLLBACK-SKYNET-V8.cmd`.
 **Validacao no seu PC e obrigatoria**: a disponibilidade das dependencias npm e
 das portas locais varia de maquina para maquina.
 
+<<<<<<< Updated upstream
 ## Execucao em Linux ou ambiente na nuvem
 
 Use Node.js 22.12 ou mais recente. O modo de producao serve o frontend compilado,
@@ -62,3 +68,5 @@ para esse outro computador, nao para a maquina que executa o SKYNET.
 O desenvolvimento com recarga automatica continua disponivel com `npm run backend`
 e `npm run dev`. `npm run dev:remote` aceita conexoes de rede, e os hostnames
 permitidos devem ser informados em `SKYNET_ALLOWED_HOSTS`, separados por virgula.
+=======
+>>>>>>> Stashed changes

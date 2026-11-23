@@ -1,0 +1,32 @@
+// src/config/index.ts
+/**
+ * Configuração central do projeto SKYNET-V8-LUCIFER v8.9.0
+ * Sistema de Dashboard Local Avanzado com WebSocket e API REST
+ */
+
+export const env = {
+  NODE_ENV: process.env.NODE_ENV || 'development',
+  NODE_VERSION: process.version,
+  PORT: Number(process.env.SKYNET_PORT) || 3000,
+  BACKEND_PORT: Number(process.env.SKYNET_LOCAL_CORE_PORT) || 3000,
+  FRONTEND_PORT: Number(process.env.VITE_PORT) || 5173,
+  WS_PORT: Number(process.env.SKYNET_WS_PORT) || 6000,
+};
+
+export const secrets = {
+  // Chaves de ambiente reais nunca aqui! Use .env para isso.
+  // Exemplo: NODE_ENV, JWT_SECRET, DATABASE_URL
+} as const;
+
+export const api = {
+  baseURL: `http://localhost:${env.BACKEND_PORT}`,
+  proxyPrefix: '/api',
+  healthCheckPath: '/health',
+  wsUrl: `/ws`,
+};
+
+export const build = {
+  outDir: 'dist',
+  sourcemap: true,
+  minify: false,
+};

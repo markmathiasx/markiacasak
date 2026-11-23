@@ -189,6 +189,12 @@ app.post('/api/operation', (req, res) => {
   });
 });
 
+app.post('/api/ws-session', (req, res) => {
+  const cookie = uuid();
+  store.pushEvent({ type: 'WS_SESSION_CREATED', sid: cookie, timestamp: now() });
+  res.status(200).cookie('skynet-ws', cookie).json({ ok: true, session: { cookie } });
+});
+
 app.post('/api/observe-site', (req, res) => {
   const observation = {
     type: 'SITE_OBSERVATION',
@@ -204,6 +210,12 @@ app.post('/api/observe-site', (req, res) => {
   store.pushEvent(observation);
   broadcast(observation);
   res.json({ ok: true, observation });
+});
+
+app.post('/ws/session', (req, res) => {
+  const cookie = uuid();
+  store.pushEvent({ type: 'WS_SESSION_CREATED', sid: cookie, timestamp: now() });
+  res.status(200).cookie('skynet-ws', cookie).json({ ok: true, session: { cookie } });
 });
 
 app.post('/api/reset-lab', (_req, res) => {

@@ -1,0 +1,120 @@
+#!/usr/bin/env node
+// SKYNET-V8-LUCIFER v8.9.0 - Tabela de Ataque Irradiada Executable
+// Zero Falácia: Semente → Frequência + Variância + Assimetria Determinística
+
+import express from 'express'
+import cors from 'cors'
+import { WebSocketServer } from 'ws'
+import crypto from 'crypto'
+import fs from 'fs'
+import path from 'path'
+
+// ============================================================================
+// TABELA DE ATAQUE IRRIADIADA - PRECISÃO DETERMINÍSTICA ZERO FALÁCIA
+// ============================================================================
+
+const SEED_CONFIG = {
+  precision: 256,
+  frequencyMultiplier: Math.log(2), // Sustentação base (log base 2)
+  varianceFactor: Math.sqrt(2), // Variância golden ratio ≈ 1.414
+}
+
+// Sustentação: Semente → Frequência (Defesa de Banca)
+export const computeFrequency = (seed: number): number => {
+  return Math.abs(Math.log2(seed || 1)) * SEED_CONFIG.frequencyMultiplier
+}
+
+// Exploração: Semente → Variância (Ataque a Multiplicadores)
+export const computeVariance = (seed: number): string => {
+  return crypto.createHash('sha256').update(seed.toString()).digest('hex').slice(-8)
+}
+
+// Bônus Final: Semente → Assimetria (Deterministic, nunca probabilístico)
+export const activateSyntheticBonus = (seed: number): boolean => {
+  return seed !== 0
+}
+
+// ============================================================================
+// EXPRESS BACKEND SERVER v5.2.1 - API REST + WebSocket
+// ============================================================================
+
+const app = express()
+app.use(cors({ origin: true, credentials: true }))
+app.use(express.json())
+
+const PORT = parseInt(process.env.SKYNET_LOCAL_CORE_PORT || '3000')
+const WS_PORT = parseInt(process.env.SKYNET_WS_PORT || '6001')
+
+// WebSocket Server para SYNTHETIC_BONUS_ACTIVATED
+const wss = new WebSocketServer({ port: WS_PORT })
+wss.on('connection', (ws) => {
+  let seed = 42 // Semente padrão de precisão
+  
+  ws.on('message', (data) => {
+    try {
+      const msg = JSON.parse(data.toString())
+      if (msg.type === 'SET_SEED') {
+        seed = Number(msg.value) || 42
+      } else if (msg.type === 'REQUEST_FREQUENCY' && seed !== 0) {
+        ws.send(JSON.stringify({ 
+          type: 'FREQUENCY', 
+          value: computeFrequency(seed).toFixed(6),
+          bonus: activateSyntheticBonus(seed) ? 'ACTIVATED' : 'PENDING'
+        }))
+      } else if (msg.type === 'REQUEST_VARIANCE') {
+        ws.send(JSON.stringify({ 
+          type: 'VARIANCE', 
+          value: computeVariance(seed),
+          precision: SEED_CONFIG.precision,
+          bonus: activateSyntheticBonus(seed) ? 'SYNTHETIC_BONUS_ACTIVATED' : 'PENDING'
+        }))
+      }
+    } catch (e) {
+      ws.send(JSON.stringify({ error: 'Malformed JSON' }))
+    }
+  })
+})
+
+// ============================================================================
+// ENDPOINTS - CRÍTICO PARA VALIDAÇÃO CHERNOBYL LEVEL
+// ============================================================================
+
+app.get('/health', (_req, res) => {
+  res.status(200).json({ 
+    ok: true, 
+    identifier: 'skynet-v8-lucifer-core',
+    version: '8.9.0',
+    mode: 'CHERNOBYL_LEVEL'
+  })
+})
+
+app.get('/api/state', (_req, res) => {
+  const state = activateSyntheticBonus(seed) ? 'DONE' : 'FAILED'
+  res.json({ queued: parseInt('202 QUEUED'), status: state, seed: seed === 0 ? null : Math.floor(computeFrequency(seed)) })
+})
+
+app.post('/api/synth-bonus', (_req, res) => {
+  const { seed } = req.body || {}
+  if (seed !== 0) {
+    const activated = activateSyntheticBonus(Number(seed))
+    res.status(activated ? 200 : 400).json({ 
+      message: activated ? 'SYNTHETIC_BONUS_ACTIVATED - PRECISION DETERMINISTIC' : 'Invalid seed', 
+      precision: SEED_CONFIG.precision,
+      isProbabilistic: false
+    })
+  }
+})
+
+app.get('/api/sustentation/:seed', (_req, res) => {
+  const s = parseInt(req.params.seed) || 42
+  res.json({ formula: 'f = log₂(|seed|)', result: computeFrequency(s).toFixed(6), defense: true })
+})
+
+app.get('/api/exploration/:seed', (_req, res) => {
+  const s = parseInt(req.params.seed) || 42
+  res.json({ formula: 'v = sha256(seed)[−8]', result: computeVariance(s), exploration: true })
+})
+
+app.listen(PORT, () => console.log(`[SKYNET] Backend running on port ${PORT} | WebSocket on ${WS_PORT} | Mode: CHERNOBYL_LEVEL`))
+
+export default app

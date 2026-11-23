@@ -11,7 +11,7 @@
 // ==/UserScript==
 (() => {
   'use strict';
-  const endpoint='http://127.0.0.1:3000/api/observe-site';
+  const endpoint='http://127.0.0.1:39188/api/observe-site';
   const signatures=[
     ['PGSOFT',/pg\s*soft|pgsoft|ss_pgsoft/i],['HACKSAW',/hacksaw/i],
     ['PRAGMATIC',/pragmatic(?:\s|-)?play|ppgames/i],['EVOPLAY',/evoplay/i],
@@ -59,3 +59,4 @@
   observer.observe(document.documentElement,{subtree:true,childList:true});
   setInterval(send,15000);
 })();
+

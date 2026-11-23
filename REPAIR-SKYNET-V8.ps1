@@ -7,8 +7,8 @@ $Project=Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $Project
 Write-Banner 'SKYNET V8 LUCIFER - REPAIR 8.9.0' Green
 Stop-ProjectProcesses $Project
-Assert-PortFree 3000 $Project
-Assert-PortFree 5173 $Project
+Assert-PortFree (Get-LocalPort $env:SKYNET_LOCAL_CORE_PORT 39188) $Project
+Assert-PortFree (Get-LocalPort $env:SKYNET_LOCAL_UI_PORT 5173) $Project
 if (!(Get-Command node -ErrorAction SilentlyContinue)) { throw 'Node.js ausente' }
 if (!(Get-Command npm -ErrorAction SilentlyContinue)) { throw 'npm ausente' }
 # Keep a healthy node_modules intact; this avoids needless destructive reinstalls.
@@ -22,8 +22,18 @@ if ($LASTEXITCODE -ne 0) {
 if ($LASTEXITCODE -ne 0) { throw 'server.cjs invalido' }
 & node --check .\tests.cjs
 if ($LASTEXITCODE -ne 0) { throw 'tests.cjs invalido' }
+<<<<<<< Updated upstream
 & npm.cmd test
 if ($LASTEXITCODE -ne 0) { throw 'testes ou build falharam; nao iniciar' }
+=======
+& npm.cmd run test:all
+if ($LASTEXITCODE -ne 0) { throw 'testes falharam; nao iniciar' }
+& npm.cmd run lint
+if ($LASTEXITCODE -ne 0) { throw 'lint falhou; nao iniciar' }
+& npm.cmd run build
+if ($LASTEXITCODE -ne 0) { throw 'build falhou; nao iniciar' }
+>>>>>>> Stashed changes
 & (Join-Path $Project 'START-SKYNET-V8.ps1') -SkipTests -NoBrowser:$NoBrowser
 if (!$?) { throw 'Inicializacao falhou' }
 Write-Host '[OK] Testes, build, backend, frontend, proxy, fila e websocket validados.' -ForegroundColor Green
+

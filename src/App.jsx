@@ -63,6 +63,8 @@ export default function App() {
   useEffect(() => {
     let socket;
     let updateTimer;
+    let connecting = false;
+    let disposed = false;
     function scheduleRefresh() {
       if (updateTimer !== undefined) return;
       updateTimer = setTimeout(() => {
@@ -70,10 +72,20 @@ export default function App() {
         void refresh();
       }, 250);
     }
-    function connect() {
-      if (socket && socket.readyState !== WebSocket.CLOSED) return;
+    async function connect() {
+      if (connecting || (socket && socket.readyState !== WebSocket.CLOSED)) return;
+      connecting = true;
+      try {
+        await api('/api/ws-session', { method: 'POST' });
+      } catch {
+        if (!disposed) setWsStatus('OFFLINE');
+        return;
+      } finally {
+        connecting = false;
+      }
+      if (disposed) return;
       const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-      socket = new WebSocket(`${protocol}//${location.host}/ws`);
+      socket = new WebSocket(`${protocol}//127.0.0.1:${import.meta.env.VITE_SKYNET_CORE_PORT}/ws`);
       wsRef.current = socket;
       setWsStatus('CONNECTING');
       socket.onopen = () => { setWsStatus('ONLINE'); scheduleRefresh(); };
@@ -101,6 +113,7 @@ export default function App() {
     const poll = setInterval(scheduleRefresh, 2500);
     const reconnect = setInterval(connect, 1800);
     return () => {
+      disposed = true;
       clearTimeout(initial);
       clearTimeout(updateTimer);
       clearInterval(poll);

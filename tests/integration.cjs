@@ -103,6 +103,19 @@ test('CLI host/port beats stale environment', async()=>{
   assert.equal(h.port,PORT);
 });
 
+test('invalid operation input and malformed JSON return actionable client errors', async () => {
+  const url = `http://127.0.0.1:${PORT}/api/operation`;
+  for (const [body, error] of [
+    ['{"intensity":1.5}', 'INVALID_OPERATION_INTENSITY'],
+    ['{"provider":[]}', 'INVALID_OPERATION_FIELD'],
+    ['{', 'INVALID_JSON'],
+  ]) {
+    const response = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body });
+    assert.equal(response.status, 400);
+    assert.equal((await response.json()).error, error);
+  }
+});
+
 test('session manager endpoint creates synthetic session', async()=>{
   const r=await fetch(`http://127.0.0.1:${PORT}/api/session`,{method:'POST',headers:{'content-type':'application/json'},body:'{"label":"test"}'});
   const b=await r.json();
@@ -172,8 +185,14 @@ test('intensidade fracionária é normalizada para quadros inteiros', async()=>{
 });
 
 test('websocket PING/PONG', async()=>{
+  const response = await fetch(`http://127.0.0.1:${PORT}/api/ws-session`, { method: 'POST' });
+  assert.equal(response.status, 200);
+  const cookie = response.headers.get('set-cookie').split(';', 1)[0];
+  const dashboardSession = await fetch(`http://127.0.0.1:${PORT}/ws/session`, { method: 'POST' });
+  assert.equal(dashboardSession.status, 200);
+  assert.match(dashboardSession.headers.get('set-cookie') || '', /skynet-ws=/);
   await new Promise((resolve,reject)=>{
-    const ws=new WebSocket(`ws://127.0.0.1:${PORT}/ws`);
+    const ws=new WebSocket(`ws://127.0.0.1:${PORT}/ws`, { headers: { cookie } });
     const t=setTimeout(()=>reject(new Error('timeout')),3000);
     ws.on('open',()=>ws.send('PING'));
     ws.on('message',raw=>{

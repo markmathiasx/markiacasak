@@ -5,6 +5,8 @@ const crypto = require('node:crypto');
 const { PacketGenerator } = require('../core/packet-generator.cjs');
 const { SessionManager } = require('../core/session-manager.cjs');
 const { OperationEngine } = require('../core/operation-engine.cjs');
+const { once } = require('node:events');
+const { EventEmitter } = require('node:events');
 
 test('synthetic Socket.IO hashes match emitted UTF-8 frames', () => {
   const p = new PacketGenerator().makeSocketIo('lab.test', { count: 1 });
@@ -12,6 +14,29 @@ test('synthetic Socket.IO hashes match emitted UTF-8 frames', () => {
   assert.equal(p.bytes, Buffer.byteLength(p.frame));
   assert.equal(p.sha256, crypto.createHash('sha256').update(p.frame).digest('hex'));
   assert.equal(JSON.parse(p.frame.slice(2))[1].synthetic, true);
+});
+
+test('a synthetic write failure is reported and the following job completes', async () => {
+  const operations = [];
+  const emitter = new EventEmitter();
+  let fail = true;
+  const store = {
+    operations,
+    metrics: { framesGenerated: 0, errors: 0 },
+    pushEvent: () => { if (fail) { fail = false; throw new Error('fixture'); } },
+    pushOperation: job => operations.push(job),
+  };
+  const engine = new OperationEngine({
+    packetGenerator: new PacketGenerator(), sessions: new SessionManager(), store,
+    broadcast: event => emitter.emit(event.type, event),
+  });
+  const complete = once(emitter, 'OPERATION_COMPLETED', { signal: AbortSignal.timeout(1000) });
+  const first = engine.enqueue({ provider: 'PGSOFT', vector: 'FIXTURE', intensity: 1 });
+  const next = engine.enqueue({ provider: 'PGSOFT', vector: 'FIXTURE', intensity: 2 });
+  assert.equal(first.status, 'QUEUED');
+  assert.equal((await complete)[0].id, next.id);
+  assert.deepEqual(operations.map(job => job.status), ['FAILED', 'DONE']);
+  assert.equal(store.metrics.errors, 1);
 });
 
 test('local sessions advance sequence without sharing session ids', () => {

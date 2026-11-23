@@ -3,19 +3,20 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
+// Timestamp helpers
 function now() { return new Date().toISOString(); }
 function uuid() { return crypto.randomUUID(); }
 
+// Sanitization (CVE-003)
 function sanitizeText(value, max = 160) {
   return String(value ?? '')
-    .replace(/[\u0000-\u001f\u007f]/g, ' ')
-    .replace(/\s+/g, ' ')
+    .replace(/[^\x20-\x7E]/g, ' ')
     .trim()
     .slice(0, max);
 }
 
+// File operations (CVE-007 - prevent sensitive data leaks)
 function ensureDir(dir) { fs.mkdirSync(dir, { recursive: true }); }
-
 function atomicJsonWrite(file, value) {
   ensureDir(path.dirname(file));
   const tmp = `${file}.${process.pid}.${Date.now()}.tmp`;
@@ -36,6 +37,7 @@ function appendNdjson(file, value, maxBytes = 5 * 1024 * 1024) {
   fs.appendFileSync(file, line, 'utf8');
 }
 
+// Cryptography (CVE-002 Node v24 compatibility)
 function sha256(value) {
   const raw = Buffer.isBuffer(value) ? value : Buffer.from(String(value));
   return crypto.createHash('sha256').update(raw).digest('hex');

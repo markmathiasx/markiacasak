@@ -3,6 +3,6 @@
   "version": "8.9.0",
   "base": "V8 Revival 8.8.0",
   "frontend": "http://127.0.0.1:5173/",
-  "backend": "http://127.0.0.1:3000/",
+  "backend": "http://127.0.0.1:39188/",
   "architecture": "local protocol research control plane"
 }

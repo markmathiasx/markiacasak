@@ -1,8 +1,9 @@
-class CodexInterceptor {
+export class CodexInterceptor {
+    constructor(private readonly measureLocal: (label: string) => Promise<void>) {}
     // Classifica telemetria local; não prevê resultados nem acessa estado externo.
     async analyzeSeedLatency(provider: string) {
         const startTime = performance.now();
-        const response = await this.pingProvider(provider);
+        await this.measureLocal(provider);
         const endTime = performance.now();
         
         const latency = endTime - startTime;

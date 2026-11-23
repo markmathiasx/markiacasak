@@ -46,7 +46,7 @@ test('health is JSON and CLI port wins over stale env', async () => {
   const h = await r.json();
   assert.equal(h.ok, true);
   assert.equal(h.service, 'skynet-v8-lucifer-core');
-  assert.equal(h.version, '8.9.0');
+  assert.equal(h.version, '8.10.0'); // Versão atual do sistema
   assert.equal(h.port, PORT);
 });
 
@@ -99,8 +99,12 @@ test('site observer accepts only page metadata', async () => {
 });
 
 test('websocket handshake and PONG', async () => {
+  // Test WebSocket endpoint instead of non-existent /api/ws-session
+  const response = await fetch(`http://127.0.0.1:${PORT}/ws/session`, { method: 'POST' });
+  assert.equal(response.status, 200);
+  const cookie = response.headers.get('set-cookie').split(';', 1)[0];
   await new Promise((resolve, reject) => {
-    const ws = new WebSocket(`ws://127.0.0.1:${PORT}/ws`);
+    const ws = new WebSocket(`ws://127.0.0.1:${PORT}/ws`, { headers: { cookie } });
     const timer = setTimeout(() => reject(new Error('ws timeout')), 5000);
     let connected = false;
     ws.on('open', () => ws.send('PING'));

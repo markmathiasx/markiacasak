@@ -1,0 +1,42 @@
+{
+  "cityState": "COMPLETE",
+  "providers": {
+    "PGSOFT": {
+      "name": "PGSOFT",
+      "rtp": 0.958
+    },
+    "HACKSAW_GAMES": {
+      "name": "HACKSAW_GAMES",
+      "rtp": 0.962
+    },
+    "PRAGMATIC_PLAY": {
+      "name": "PRAGMATIC_PLAY",
+      "rtp": 0.955
+    }
+  },
+  "aiScores": {
+    "PGSOFT": 1.8,
+    "HACKSAW_GAMES": 2.1,
+    "PRAGMATIC_PLAY": 1.6
+  },
+  "bankrollStatus": 1.4502629610835702,
+  "executionTime": 1795402966932,
+  "exportReady": true,
+  "hotspots": [
+    {
+      "region": "north",
+      "activeTurbines": 15,
+      "status": "ACTIVE"
+    },
+    {
+      "region": "south",
+      "activeTurbines": 15,
+      "status": "ACTIVE"
+    },
+    {
+      "region": "east",
+      "activeTurbines": 15,
+      "status": "ACTIVE"
+    }
+  ]
+}

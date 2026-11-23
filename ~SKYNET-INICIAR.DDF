@@ -1,0 +1,21 @@
+;Auto-generated Diamond Directive File. Can be deleted without harm.
+.Set CabinetNameTemplate=C:\Users\markkk\Downloads\SKYNET-V8-LUCIFER-v8.9.0\~SKYNET-INICIAR.CAB
+.Set CompressionType=LZX
+.Set CompressionLevel=7
+.Set InfFileName=C:\Users\markkk\Downloads\SKYNET-V8-LUCIFER-v8.9.0\~SKYNET-INICIAR_LAYOUT.INF
+.Set RptFileName=C:\Users\markkk\Downloads\SKYNET-V8-LUCIFER-v8.9.0\~SKYNET-INICIAR.RPT
+.Set MaxDiskSize=CDROM
+.Set ReservePerCabinetSize=0
+.Set InfCabinetLineFormat=*cab#*=Application Source Media,*cabfile*,0
+.Set Compress=on
+.Set CompressionMemory=21
+.Set DiskDirectoryTemplate=
+.Set Cabinet=ON
+.Set MaxCabinetSize=999999999
+.Set InfDiskHeader=
+.Set InfDiskLineFormat=
+.Set InfCabinetHeader=[SourceDisksNames]
+.Set InfFileHeader=
+.Set InfFileHeader1=[SourceDisksFiles]
+.Set InfFileLineFormat=*file*=*cab#*,,*size*,*csum*
+"C:\Users\markkk\AppData\Local\Temp\skynet-iexpress-66ea940431eb438ea991ba8d785e9c8c\source\launch.cmd"

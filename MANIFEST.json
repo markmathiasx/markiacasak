@@ -1,5 +1,6 @@
 {
   "version": "8.9.0",
+<<<<<<< Updated upstream
   "files": [
     {
       "path": ".gitignore",
@@ -277,4 +278,9 @@
       "sha256": "9b8149e304532b3a8e31991bdab26f1cec30a3d498ca2d2c68094f9e5da2809d"
     }
   ]
+=======
+  "project": "SKYNET",
+  "status": "healing",
+  "author": "markkk"
+>>>>>>> Stashed changes
 }
